@@ -10,7 +10,7 @@ import Sidebar from "../component.js/sidebar";
 
 import "../styles/Dashboard.css";
 
-const API = "http://localhost:3000";
+const API = " https://child-tracking-backend.onrender.com";
 
 export default function Dashboard({ setToken }) {
   const [children, setChildren] = useState([]);

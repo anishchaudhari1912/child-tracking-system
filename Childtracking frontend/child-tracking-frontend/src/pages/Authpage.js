@@ -10,8 +10,8 @@ export default function AuthPage({ setToken }) {
   const submit = async () => {
     try {
       const url = isLogin
-        ? "http://localhost:3000/user/login"
-        : "http://localhost:3000/user/signup";
+        ? "https://child-tracking-backend.onrender.com/user/login"
+        : "https://child-tracking-backend.onrender.com/user/signup";
 
       const res = await axios.post(url, { username, password });
 

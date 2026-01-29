@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3000";
+const API = " https://child-tracking-backend.onrender.com";
 
 export default function LocationHistory({ childId }) {
   const [history, setHistory] = useState([]);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./Auth.css";
 
-const API = "http://localhost:3000";
+const API = " https://child-tracking-backend.onrender.com";
 
 export default function Signup({ setPage, setEmail }) {
   const [form, setForm] = useState({
