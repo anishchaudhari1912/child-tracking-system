@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
-const mongoURL = process.env.DB_URL; // Local DATABASE CONNECTION DATA STORED LOCALLY MONGO DB COMPASS replace 'hotels' with your DB name
-//const mongoURL=process.env.DB_URL;//GLOBAL DATABASE DATA STORED IN MONGO ATLAS MongoAtlas
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-mongoose.connect(mongoURL); // no need for deprecated options
+const mongoURL = process.env.DB_URL;
+
+mongoose.connect(mongoURL);
 
 const db = mongoose.connection;
 
