@@ -1,0 +1,163 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #667eea, #764ba2);
+}
+
+/* AUTH PAGE */
+.auth-bg {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.auth-card {
+  background: white;
+  padding: 30px;
+  width: 320px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 10px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+.toggle {
+  margin-top: 10px;
+  color: #667eea;
+  cursor: pointer;
+}
+.auth-box {
+  width: 350px;
+  margin: 100px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 10px;
+  background: #667eea;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}
+
+/* DASHBOARD */
+.dashboard-bg {
+  min-height: 100vh;
+  background: #f4f6fb;
+}
+
+.header {
+  background: #667eea;
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown button {
+  background: white;
+  border: none;
+  padding: 6px 12px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  background: white;
+  display: none;
+  padding: 10px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 30px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.card input {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+}
+
+.card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.child-item {
+  background: #f4f6fb;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+.child-item {
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+  cursor: pointer;
+  background: #f4f6fb;
+}
+
+.child-item.active {
+  background: #667eea;
+  color: white;
+}
+
+.history-item {
+  font-size: 13px;
+  padding: 4px 0;
+}
