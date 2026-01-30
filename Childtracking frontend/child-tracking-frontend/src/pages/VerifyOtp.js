@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
+import "../styles/Auth.css";
 const API = "https://child-tracking-backend.onrender.com";
 
 export default function VerifyOtp({ email, setPage }) {
