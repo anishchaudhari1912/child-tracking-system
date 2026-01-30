@@ -1,8 +1,17 @@
 const jwt = require("jsonwebtoken");
 
+const generateToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "1d"
+  });
+};
+
 const jwtAuthMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: "Token missing" });
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "Token missing" });
+  }
 
   const token = authHeader.split(" ")[1];
 
@@ -11,12 +20,11 @@ const jwtAuthMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Invalid token" });
   }
 };
 
-const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
+module.exports = {
+  generateToken,
+  jwtAuthMiddleware
 };
-
-module.exports = { jwtAuthMiddleware, generateToken };

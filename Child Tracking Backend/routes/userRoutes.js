@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/user");
-const { generateToken } = require("../jwt");
+const { generateToken,jwtAuthMiddleware  } = require("../jwt");
 const { generateOTP } = require("../utlis/otp");
 
 /* ================= SIGNUP ================= */
