@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./Auth.css";
 
-const API = " https://child-tracking-backend.onrender.com";
+const API = "https://child-tracking-backend.onrender.com";
 
 export default function Login({ setToken }) {
   const [username, setUsername] = useState("");

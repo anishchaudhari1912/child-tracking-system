@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API = " https://child-tracking-backend.onrender.com";
+const API = "https://child-tracking-backend.onrender.com";
 
 export default function VerifyOtp({ email, setPage }) {
   const [otp, setOtp] = useState("");
