@@ -19,4 +19,6 @@ db.on("disconnected", () => {
   console.log("MongoDB disconnected");
 });
 
+console.log("MongoDB URL:", process.env.DB_URL);
+
 module.exports = db;
