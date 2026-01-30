@@ -1,19 +1,42 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/user");
-const { generateToken, jwtAuthMiddleware } = require("../jwt");
+const { generateToken } = require("../jwt");
 const { generateOTP } = require("../utlis/otp");
-const { sendOTPEmail } = require("../utlis/mailer");
+
 /* ================= SIGNUP ================= */
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, username, password } = req.body;
+    let { name, email, username, password } = req.body;
 
-    const exists = await User.findOne({ $or: [{ email }, { username }] });
-    if (exists) {
+    email = email.trim().toLowerCase();
+    username = username.trim();
+
+    const existing = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    /* VERIFIED USER → BLOCK */
+    if (existing && existing.isVerified) {
       return res.status(400).json({ error: "User already exists" });
     }
 
+    /* UNVERIFIED USER → RESEND OTP */
+    if (existing && !existing.isVerified) {
+      existing.otp = generateOTP();
+      existing.otpExpiry = Date.now() + 5 * 60 * 1000;
+      await existing.save();
+
+      console.log("Resent OTP:", existing.otp);
+
+      return res.json({
+        message: "OTP re-sent",
+        email: existing.email,
+        otp: existing.otp // DEV ONLY
+      });
+    }
+
+    /* NEW USER */
     const otp = generateOTP();
 
     const user = new User({
@@ -22,20 +45,18 @@ router.post("/signup", async (req, res) => {
       username,
       password,
       otp,
-      otpExpiry: Date.now() + 5 * 60 * 1000,
-      isVerified: false
+      otpExpiry: Date.now() + 5 * 60 * 1000
     });
 
     await user.save();
 
-    // ✅ SEND EMAIL
-    await sendOTPEmail(email, otp);
+    console.log("OTP:", otp);
 
     res.status(201).json({
-      message: "OTP sent to your email",
-      email
+      message: "OTP sent",
+      email,
+      otp // DEV ONLY
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Signup failed" });
@@ -44,55 +65,39 @@ router.post("/signup", async (req, res) => {
 
 /* ================= VERIFY OTP ================= */
 router.post("/verify-otp", async (req, res) => {
-  try {
-    const { email, otp } = req.body;
+  const { email, otp } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
+  if (!user) return res.status(404).json({ error: "User not found" });
 
-    if (user.otp !== otp.toString() || user.otpExpiry < Date.now()) {
-      return res.status(400).json({ error: "Invalid or expired OTP" });
-    }
-
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
-
-    await user.save();
-
-    res.json({ message: "Account verified successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "OTP verification failed" });
+  if (user.otp !== otp || user.otpExpiry < Date.now()) {
+    return res.status(400).json({ error: "Invalid or expired OTP" });
   }
+
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpiry = undefined;
+  await user.save();
+
+  res.json({ message: "Account verified" });
 });
 
-
 /* ================= LOGIN ================= */
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
-    router.post("/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
+  const user = await User.findOne({ username: username.trim() });
+  if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
-    const user = await User.findOne({ username });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
-
-    if (!user.isVerified) {
-      return res.status(401).json({ error: "Please verify OTP first" });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const token = generateToken({ id: user._id });
-
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ error: "Login failed" });
+  if (!user.isVerified) {
+    return res.status(401).json({ error: "Verify OTP first" });
   }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
+
+  const token = generateToken({ id: user._id });
+  res.json({ token });
 });
 
 /* ================= PROFILE ================= */
