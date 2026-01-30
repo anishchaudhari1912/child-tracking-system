@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import "./Auth.css";
+
+import "../styles/Auth.css";
 
 const API = "https://child-tracking-backend.onrender.com"; 
 // or http://localhost:3000 for local
