@@ -1,4 +1,4 @@
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker, Circle, useJsApiLoader } from "@react-google-maps/api";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
@@ -10,15 +10,21 @@ const containerStyle = {
   borderRadius: "10px"
 };
 
+// Default center (Pune)
+const DEFAULT_CENTER = { lat: 18.5204, lng: 73.8567 };
+
+// Static safe zone (can be made dynamic later)
 const SAFE_ZONE = {
   lat: 18.5204,
   lng: 73.8567,
-  radius: 0.01
+  radius: 500 // meters
 };
 
-const isOutsideSafeZone = (lat, lng) =>
-  Math.abs(lat - SAFE_ZONE.lat) > SAFE_ZONE.radius ||
-  Math.abs(lng - SAFE_ZONE.lng) > SAFE_ZONE.radius;
+const isOutsideSafeZone = (lat, lng) => {
+  const dLat = Math.abs(lat - SAFE_ZONE.lat);
+  const dLng = Math.abs(lng - SAFE_ZONE.lng);
+  return dLat > 0.01 || dLng > 0.01;
+};
 
 export default function LiveMap({ childId }) {
   const [position, setPosition] = useState(null);
@@ -26,7 +32,7 @@ export default function LiveMap({ childId }) {
   const alertShown = useRef(false);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_KEY
+    googleMapsApiKey: "AIzaSyCojLDNdLYaMlChjoFxN25ZX_vzt3enRt4"
   });
 
   useEffect(() => {
@@ -39,14 +45,18 @@ export default function LiveMap({ childId }) {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        if (res.data) {
-          const { latitude, longitude } = res.data;
-          setPosition({ lat: latitude, lng: longitude });
+        if (!res.data) {
+          console.log("No GPS data yet");
+          return;
+        }
 
-          if (isOutsideSafeZone(latitude, longitude) && !alertShown.current) {
-            alert("🚨 Child is outside the safe zone!");
-            alertShown.current = true;
-          }
+        const { latitude, longitude } = res.data;
+
+        setPosition({ lat: latitude, lng: longitude });
+
+        if (isOutsideSafeZone(latitude, longitude) && !alertShown.current) {
+          alert("🚨 Child is outside the safe zone!");
+          alertShown.current = true;
         }
       } catch (err) {
         console.error("Location fetch failed");
@@ -59,15 +69,25 @@ export default function LiveMap({ childId }) {
   }, [childId, token]);
 
   if (!isLoaded) return <p>Loading map...</p>;
-  if (!position) return <p>Waiting for location...</p>;
 
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}
-      center={position}
+      center={position || DEFAULT_CENTER}
       zoom={15}
     >
-      <Marker position={position} />
+      {position && <Marker position={position} />}
+
+      <Circle
+        center={{ lat: SAFE_ZONE.lat, lng: SAFE_ZONE.lng }}
+        radius={SAFE_ZONE.radius}
+        options={{
+          fillColor: "#22c55e",
+          fillOpacity: 0.2,
+          strokeColor: "#16a34a",
+          strokeOpacity: 0.8
+        }}
+      />
     </GoogleMap>
   );
 }

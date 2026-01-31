@@ -106,4 +106,7 @@ router.get("/profile", jwtAuthMiddleware, async (req, res) => {
   res.json(user);
 });
 
+
+
+
 module.exports = router;

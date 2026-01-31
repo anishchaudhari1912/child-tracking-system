@@ -7,6 +7,11 @@ const childSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
+  },
+  safeZone: {
+    lat: Number,
+    lng: Number,
+    radius: Number // meters
   }
 });
 
