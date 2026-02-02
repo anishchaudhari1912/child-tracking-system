@@ -1,16 +1,19 @@
 
-import { useEffect, useState,useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-
+import API from "../Api";
 import Header from "../component.js/header";
 import LiveMap from "../component.js/LiveMap";
 import LocationHistory from "../component.js/LocationHistory";
 import Sidebar from "../component.js/sidebar";
 
 
+
 import "../styles/Dashboard.css";
 
-const API = "https://child-tracking-backend.onrender.com";
+
+
+
 
 export default function Dashboard({ setToken }) {
   const [children, setChildren] = useState([]);
@@ -21,17 +24,19 @@ export default function Dashboard({ setToken }) {
 
   const token = localStorage.getItem("token");
 
-  
 
- // ✅ useCallback makes function stable
+
+  // ✅ useCallback makes function stable
   const fetchChildren = useCallback(async () => {
     const res = await axios.get(`${API}/child`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
     setChildren(res.data);
   }, [token]);
 
- // ✅ ESLint satisfied
+  // ✅ ESLint satisfied
   useEffect(() => {
     fetchChildren();
   }, [fetchChildren]);

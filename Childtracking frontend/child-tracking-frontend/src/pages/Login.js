@@ -1,9 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
+import API from "../Api";
 
 import "../styles/Auth.css";
 
-const API = "https://child-tracking-backend.onrender.com";
 
 export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
@@ -15,9 +15,9 @@ export default function Login({ setToken }) {
     setError("");
 
     try {
-      const res = await axios.post(`${API}/user/login`.trim(), {
-        username,
-        password,
+      const res = await axios.post(`${API}/user/login`, {
+        username:username.trim(),
+        password
       });
 
       localStorage.setItem("token", res.data.token);

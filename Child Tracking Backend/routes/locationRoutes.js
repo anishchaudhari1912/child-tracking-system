@@ -3,11 +3,11 @@ const router = express.Router();
 const Location = require("../Models/location");
 const { jwtAuthMiddleware } = require("../jwt");
 
-// utils/geoFence.js (OPTIONAL: or paste directly in locationRoutes.js)
+/* ================= SAFE ZONE UTILITY ================= */
 const isOutsideSafeZone = (childLat, childLng, zone) => {
   const toRad = (v) => (v * Math.PI) / 180;
 
-  const R = 6371000; // Earth radius in meters
+  const R = 6371000; // meters
   const dLat = toRad(childLat - zone.lat);
   const dLng = toRad(childLng - zone.lng);
 
@@ -18,21 +18,20 @@ const isOutsideSafeZone = (childLat, childLng, zone) => {
       Math.sin(dLng / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
-
-  return distance > zone.radius;
+  return R * c > zone.radius;
 };
 
-
-
-
-/* ADD / UPDATE LOCATION */
-router.post("/:childId", async (req, res) => {
+/* ================= ADD / UPDATE LOCATION ================= */
+router.post("/:childId", jwtAuthMiddleware, async (req, res) => {
   try {
     const { latitude, longitude } = req.body;
 
+    if (latitude == null || longitude == null) {
+      return res.status(400).json({ error: "Latitude & Longitude required" });
+    }
+
     const location = new Location({
-      child: req.params.childId,
+      child: req.params.childId, // ✅ FIXED
       latitude,
       longitude
     });
@@ -44,40 +43,36 @@ router.post("/:childId", async (req, res) => {
   }
 });
 
-/* GET LATEST LOCATION (Parent View) */
+/* ================= GET LATEST LOCATION ================= */
 router.get("/latest/:childId", jwtAuthMiddleware, async (req, res) => {
-  const location = await Location.findOne({ child: childId }).sort({ createdAt: -1 });
-  const child = await Child.findById(childId);
+  try {
+    const location = await Location.findOne({
+      child: req.params.childId // ✅ FIXED
+    }).sort({ createdAt: -1 });
 
-  let unsafe = false;
+    if (!location) {
+      return res.json(null); // frontend expects this
+    }
 
-  if (child.safeZone) {
-    unsafe = isOutsideSafeZone(
-      location.latitude,
-      location.longitude,
-      child.safeZone
-    );
+    res.json({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      createdAt: location.createdAt
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Location fetch failed" });
   }
-
-  res.json({
-    latitude: location.latitude,
-    longitude: location.longitude,
-    unsafe
-  });
-
 });
 
-/* LOCATION HISTORY */
+/* ================= LOCATION HISTORY ================= */
 router.get("/history/:childId", jwtAuthMiddleware, async (req, res) => {
   const locations = await Location.find({
     child: req.params.childId
-  }).sort({ createdAt: -1 }).limit(10);
+  })
+    .sort({ createdAt: -1 })
+    .limit(10);
 
   res.json(locations);
 });
 
-
-
-
-
-module.exports = {router,isOutsideSafeZone};
+module.exports = router;

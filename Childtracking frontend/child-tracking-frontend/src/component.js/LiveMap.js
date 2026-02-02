@@ -2,7 +2,7 @@ import { GoogleMap, Marker, Circle, useJsApiLoader } from "@react-google-maps/ap
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
-const API = "https://child-tracking-backend.onrender.com";
+import API from "../Api";
 
 const containerStyle = {
   width: "100%",

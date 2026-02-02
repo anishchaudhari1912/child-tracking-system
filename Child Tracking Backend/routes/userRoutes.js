@@ -70,7 +70,7 @@ router.post("/verify-otp", async (req, res) => {
   const user = await User.findOne({ email: email.toLowerCase().trim() });
   if (!user) return res.status(404).json({ error: "User not found" });
 
-  if (user.otp !== otp || user.otpExpiry < Date.now()) {
+  if (user.otp !== otp.toString() || user.otpExpiry < Date.now()) {
     return res.status(400).json({ error: "Invalid or expired OTP" });
   }
 
@@ -84,21 +84,42 @@ router.post("/verify-otp", async (req, res) => {
 
 /* ================= LOGIN ================= */
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  const user = await User.findOne({ username: username.trim() });
-  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    const user = await User.findOne({ username });
 
-  if (!user.isVerified) {
-    return res.status(401).json({ error: "Verify OTP first" });
+    console.log("User found:", user);   // 👈 ADD THIS
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    console.log("isVerified:", user.isVerified); // 👈 ADD THIS
+
+    if (!user.isVerified) {
+      return res.status(401).json({ error: "Please verify OTP first" });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    console.log("Password match:", isMatch); // 👈 ADD THIS
+
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = generateToken({
+      id: user._id,
+      username: user.username
+    });
+
+    res.json({ token });
+
+  } catch (err) {
+    res.status(500).json({ error: "Login failed" });
   }
-
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-
-  const token = generateToken({ id: user._id });
-  res.json({ token });
 });
+
 
 /* ================= PROFILE ================= */
 router.get("/profile", jwtAuthMiddleware, async (req, res) => {
