@@ -17,9 +17,19 @@ app.use((req, res, next) => {
 
 /* ✅ CORS */
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "https://child-tracking-system.netlify.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+app.options("*", cors());   // ✅ IMPORTANT
+
 
 /* ✅ BODY PARSER */
 app.use(express.json());
