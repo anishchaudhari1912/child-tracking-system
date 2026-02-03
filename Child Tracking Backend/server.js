@@ -28,7 +28,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.options("*", cors());   // ✅ IMPORTANT
+
 
 
 /* ✅ BODY PARSER */
