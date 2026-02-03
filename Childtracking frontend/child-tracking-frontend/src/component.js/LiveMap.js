@@ -32,7 +32,7 @@ export default function LiveMap({ childId }) {
   const alertShown = useRef(false);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey:process.env.REACT_APP_GOOGLE_MAPS_KEY
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_KEY
   });
 
   useEffect(() => {
@@ -40,10 +40,11 @@ export default function LiveMap({ childId }) {
 
     const fetchLocation = async () => {
       try {
-        const res = await axios.get(
-          `${API}/location/latest/${childId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(`${API}/location/latest/${childId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
         if (!res.data) {
           console.log("No GPS data yet");
