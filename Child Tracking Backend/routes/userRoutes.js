@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../Models/user");
-const { generateToken,jwtAuthMiddleware  } = require("../jwt");
+const { generateToken, jwtAuthMiddleware } = require("../jwt");
 const { generateOTP } = require("../utlis/otp");
 
 /* ================= SIGNUP ================= */
@@ -47,8 +47,13 @@ router.post("/signup", async (req, res) => {
       otp,
       otpExpiry: Date.now() + 5 * 60 * 1000
     });
+    console.log("BEFORE SAVE:", { name, email, username });
 
     await user.save();
+
+    console.log("AFTER SAVE:", user);
+
+    
 
     console.log("OTP:", otp);
 
