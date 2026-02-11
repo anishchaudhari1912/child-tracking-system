@@ -23,7 +23,7 @@ const isOutsideSafeZone = (childLat, childLng, zone) => {
 };
 
 /* ================= ADD / UPDATE LOCATION ================= */
-router.post("/:childId", jwtAuthMiddleware, async (req, res) => {
+router.post("/:childId", async (req, res) => {
   try {
     const { latitude, longitude } = req.body;
 
