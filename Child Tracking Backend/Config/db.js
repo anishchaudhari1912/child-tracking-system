@@ -3,22 +3,9 @@ require("dotenv").config();
 
 const mongoURL = process.env.DB_URL;
 
-mongoose.connect(mongoURL);
+mongoose
+  .connect(mongoURL)
+  .then(() => console.log("✅ MongoDB Atlas Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err));
 
-const db = mongoose.connection;
-
-db.on("connected", () => {
-  console.log("MongoDB connected successfully");
-});
-
-db.on("error", (err) => {
-  console.error("MongoDB connection error:", err);
-});
-
-db.on("disconnected", () => {
-  console.log("MongoDB disconnected");
-});
-
-console.log("MongoDB URL:", process.env.DB_URL);
-
-module.exports = db;
+module.exports = mongoose;   // ✅ CORRECT

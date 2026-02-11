@@ -24,6 +24,24 @@ export default function Dashboard({ setToken }) {
 
   const token = localStorage.getItem("token");
 
+  //Update Safe Zone 
+  const updateSafeZone=async ()=> {
+    if (!selectedChild){
+      alert("Select a Child First! ");
+      return;
+    }
+    await axios.put(
+      `${API}/child/safeZone/${selectedChild._id}`,
+      {
+        lat:18.5300,
+        lng:73.8500,
+        radius:800
+      },
+      {headers:{Authorization:`Bearer $ {token}` } }
+    );
+    alert("New safe Zone saved!");
+  }
+
 
 
   // ✅ useCallback makes function stable
@@ -126,6 +144,8 @@ export default function Dashboard({ setToken }) {
             ) : (
               <>
                 <h3>📍 Live Location – {selectedChild.name}</h3>
+                <button onClick={updateSafeZone}style={{marginBottom:"10px" }}>Update Safe Zone</button>
+                
 
                 <div style={{ height: "300px", marginBottom: "15px" }}>
                   <LiveMap childId={selectedChild._id} setUnsafe={setIsUnsafe} />

@@ -13,21 +13,9 @@ const containerStyle = {
 // Default center (Pune)
 const DEFAULT_CENTER = { lat: 18.5204, lng: 73.8567 };
 
-// Static safe zone (can be made dynamic later)
-const SAFE_ZONE = {
-  lat: 18.5204,
-  lng: 73.8567,
-  radius: 500 // meters
-};
-
-const isOutsideSafeZone = (lat, lng) => {
-  const dLat = Math.abs(lat - SAFE_ZONE.lat);
-  const dLng = Math.abs(lng - SAFE_ZONE.lng);
-  return dLat > 0.01 || dLng > 0.01;
-};
-
 export default function LiveMap({ childId }) {
   const [position, setPosition] = useState(null);
+  const[safeZone,setSafeZone]=useState(null);
   const token = localStorage.getItem("token");
   const alertShown = useRef(false);
 
@@ -40,9 +28,8 @@ export default function LiveMap({ childId }) {
 
     const fetchLocation = async () => {
       try {
-        const res = await axios.get(`${API}/location/latest/${childId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const res = await axios.get(`${API}/location/latest/${childId}`, 
+          {headers: {Authorization: `Bearer ${token}`
           }
         });
 
@@ -51,14 +38,18 @@ export default function LiveMap({ childId }) {
           return;
         }
 
-        const { latitude, longitude } = res.data;
+        const { latitude, longitude,safeZone:zoneFromDB} = res.data;
 
         setPosition({ lat: latitude, lng: longitude });
-
-        if (isOutsideSafeZone(latitude, longitude) && !alertShown.current) {
-          alert("🚨 Child is outside the safe zone!");
-          alertShown.current = true;
+        setSafeZone(zoneFromDB);//store safe zone from backend
+        //simple distance check (rough but works for demo)
+        const isOutside=Math.abs(latitude-zoneFromDB.lat)>0.01||Math.abs(longitude-zoneFromDB.lng)>0.01;
+        if(isOutside && !alertShown.current){
+          alert(" Child is Outside the Safe Zone");
+          alertShown.current=true;
         }
+
+       
       } catch (err) {
         console.error("Location fetch failed");
       }
@@ -70,6 +61,7 @@ export default function LiveMap({ childId }) {
   }, [childId, token]);
 
   if (!isLoaded) return <p>Loading map...</p>;
+  if (!position) return <p>Waaiting For GPS data...</p>;
 
   return (
     <GoogleMap
@@ -77,11 +69,11 @@ export default function LiveMap({ childId }) {
       center={position || DEFAULT_CENTER}
       zoom={15}
     >
-      {position && <Marker position={position} />}
-
+      <Marker position={position} />
+      {safeZone&&(
       <Circle
-        center={{ lat: SAFE_ZONE.lat, lng: SAFE_ZONE.lng }}
-        radius={SAFE_ZONE.radius}
+        center={{ lat: safeZone.lat, lng: safeZone.lng }}
+        radius={safeZone.radius}
         options={{
           fillColor: "#22c55e",
           fillOpacity: 0.2,
@@ -89,6 +81,7 @@ export default function LiveMap({ childId }) {
           strokeOpacity: 0.8
         }}
       />
+      )}
     </GoogleMap>
   );
 }

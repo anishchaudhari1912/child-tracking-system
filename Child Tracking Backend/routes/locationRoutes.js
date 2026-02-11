@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Location = require("../Models/location");
 const { jwtAuthMiddleware } = require("../jwt");
+const Child=require("../Models/child");
 
 /* ================= SAFE ZONE UTILITY ================= */
 const isOutsideSafeZone = (childLat, childLng, zone) => {
@@ -47,23 +48,30 @@ router.post("/:childId", jwtAuthMiddleware, async (req, res) => {
 router.get("/latest/:childId", jwtAuthMiddleware, async (req, res) => {
   try {
     const location = await Location.findOne({
-      child: req.params.childId // ✅ FIXED
+      child: req.params.childId
     }).sort({ createdAt: -1 });
 
     if (!location) {
       return res.json(null); // frontend expects this
     }
 
+    const child = await Child.findById(req.params.childId);
+
+    if (!child || !child.safeZone) {
+      return res.status(400).json({ error: "Safe zone not set for this child" });
+    }
+
     res.json({
       latitude: location.latitude,
       longitude: location.longitude,
-      createdAt: location.createdAt
+      createdAt: location.createdAt,
+      safeZone: child.safeZone   // ✅ VERY IMPORTANT ADDITION
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Location fetch failed" });
   }
 });
-
 /* ================= LOCATION HISTORY ================= */
 router.get("/history/:childId", jwtAuthMiddleware, async (req, res) => {
   const locations = await Location.find({

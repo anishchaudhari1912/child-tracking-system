@@ -8,10 +8,11 @@ const childSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  //Dynamic safe zone per child
   safeZone: {
-    lat: Number,
-    lng: Number,
-    radius: Number // meters
+    lat: {type:Number,default:18.5204},//pune default
+    lng:{type: Number,default:73.8567},
+    radius:{type:Number,default:500} // meters
   }
 });
 

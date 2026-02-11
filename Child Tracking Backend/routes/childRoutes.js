@@ -32,28 +32,22 @@ router.get("/", jwtAuthMiddleware, async (req, res) => {
 });
 
 // SET SAFE ZONE (Parent)
-router.put("/:id/safe-zone", jwtAuthMiddleware, async (req, res) => {
+router.put("/safezone/:childId", jwtAuthMiddleware, async (req, res) => {
   try {
     const { lat, lng, radius } = req.body;
 
-    const child = await Child.findById(req.params.id);
-    if (!child) {
-      return res.status(404).json({ error: "Child not found" });
-    }
+    const child = await Child.findByIdAndUpdate(
+      req.params.childId,
+      {
+        safeZone: { lat, lng, radius }
+      },
+      { new: true }
+    );
 
-    child.safeZone = {
-      lat,
-      lng,
-      radius
-    };
-
-    await child.save();
-
-    res.json({ message: "Safe zone updated successfully" });
+    res.json({ message: "Safe zone updated", child });
   } catch (err) {
     res.status(500).json({ error: "Failed to update safe zone" });
   }
 });
-
 
 module.exports = router;
