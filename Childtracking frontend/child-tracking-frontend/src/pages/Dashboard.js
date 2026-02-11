@@ -25,22 +25,35 @@ export default function Dashboard({ setToken }) {
   const token = localStorage.getItem("token");
 
   //Update Safe Zone 
-  const updateSafeZone=async ()=> {
-    if (!selectedChild){
-      alert("Select a Child First! ");
-      return;
-    }
+  const updateSafeZone = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("You are not logged in!");
+    return;
+  }
+
+  try {
     await axios.put(
       `${API}/child/safeZone/${selectedChild._id}`,
       {
-        lat:18.5300,
-        lng:73.8500,
-        radius:800
+        lat: 18.5300,
+        lng: 73.8500,
+        radius: 800
       },
-      {headers:{Authorization:`Bearer $ {token}` } }
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
-    alert("New safe Zone saved!");
+
+    alert("New safe zone saved!");
+  } catch (err) {
+    console.error(err);
+    alert("Safe zone update failed");
   }
+};
 
 
 
