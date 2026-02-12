@@ -25,25 +25,32 @@ const isOutsideSafeZone = (childLat, childLng, zone) => {
 /* ================= ADD / UPDATE LOCATION ================= */
 router.post("/:childId", async (req, res) => {
   try {
+    console.log("Location request received");
+
     const { latitude, longitude } = req.body;
+    const childId = req.params.childId;
 
-    if (latitude == null || longitude == null) {
-      return res.status(400).json({ error: "Latitude & Longitude required" });
-    }
+    console.log("Child:", childId);
+    console.log("Lat:", latitude, "Lng:", longitude);
 
-    const location = new Location({
-      child: req.params.childId, // ✅ FIXED
+    const newLocation = new Location({
+      child: childId,
       latitude,
-      longitude
+      longitude,
+      createdAt: new Date()
     });
 
-    await location.save();
-    res.json({ message: "Location updated" });
+    await newLocation.save();
+
+    console.log("Location saved");
+
+    res.json({ message: "Location saved successfully" });
+
   } catch (err) {
-    res.status(500).json({ error: "Failed to update location" });
+    console.log("Error saving location:", err);
+    res.status(500).json({ error: err.message });
   }
 });
-
 /* ================= GET LATEST LOCATION ================= */
 router.get("/latest/:childId", jwtAuthMiddleware, async (req, res) => {
   try {
