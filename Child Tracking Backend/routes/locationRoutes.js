@@ -52,7 +52,7 @@ router.post("/:childId", async (req, res) => {
   }
 });
 /* ================= GET LATEST LOCATION ================= */
-router.get("/latest/:childId", jwtAuthMiddleware, async (req, res) => {
+router.get("/latest/:childId",async (req, res) => {
   try {
     const location = await Location.findOne({
       child: req.params.childId
@@ -80,7 +80,7 @@ router.get("/latest/:childId", jwtAuthMiddleware, async (req, res) => {
   }
 });
 /* ================= LOCATION HISTORY ================= */
-router.get("/history/:childId", jwtAuthMiddleware, async (req, res) => {
+router.get("/history/:childId", async (req, res) => {
   const locations = await Location.find({
     child: req.params.childId
   })
