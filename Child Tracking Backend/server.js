@@ -21,7 +21,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
-  "https://child-tracking-system.netlify.app"
+  "https://child-tracking-system.netlify.app",
+  "https://gentle-concha-937df5.netlify.app"
 ];
 
 app.use(
