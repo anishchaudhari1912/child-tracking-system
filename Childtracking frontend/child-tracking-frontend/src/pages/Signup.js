@@ -1,8 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import "../styles/Auth.css";   // ✅ THIS MUST EXIST
-
-const API = "https://child-tracking-backend.onrender.com";
+import API from "../Api";
+import "../styles/Auth.css";
 
 export default function Signup({ setPage, setEmail }) {
   const [form, setForm] = useState({
@@ -12,19 +11,19 @@ export default function Signup({ setPage, setEmail }) {
     password: ""
   });
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSignup = async () => {
+    setError("");
+    setInfo("");
     try {
       const res = await axios.post(`${API}/user/signup`, form);
-
-      // DEV ONLY – OTP shown because email not implemented
-      alert("Your OTP is: " + res.data.otp);
-
       setEmail(res.data.email);
+      setInfo("OTP sent to your Gmail. Redirecting to verification...");
       setPage("verify");
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
@@ -38,6 +37,7 @@ export default function Signup({ setPage, setEmail }) {
         <p className="auth-subtitle">Child Tracking System</p>
 
         {error && <p className="error-text">{error}</p>}
+        {info && <p className="info-text">{info}</p>}
 
         <input
           name="name"
@@ -63,10 +63,7 @@ export default function Signup({ setPage, setEmail }) {
 
         <button onClick={handleSignup}>Sign Up</button>
 
-        <p
-          style={{ marginTop: "15px", color: "#fff", cursor: "pointer" }}
-          onClick={() => setPage("login")}
-        >
+        <p className="auth-link" onClick={() => setPage("login")}>
           Already have an account? Login
         </p>
       </div>
